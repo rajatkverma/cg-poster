@@ -6,8 +6,8 @@
 # End dev: 10/17/2015 1:45am
 
 import sys, argparse, string, ctypes, os, re
-import urllib, urllib2, cookielib, httplib
-import cookielib, time, base64
+import urllib
+import time, base64, ipdb
 
 from os import path
 from bs4 import BeautifulSoup
@@ -58,7 +58,7 @@ class craigslistBot:
         self.debug("Logging in")
         self.client.find_element_by_css_selector("#inputEmailHandle").send_keys(self.loginEmail)
         self.client.find_element_by_css_selector("#inputPassword").send_keys(self.loginPass)
-        self.client.find_element_by_css_selector("form[name='login'] .loginBox button").click()
+        self.client.find_element_by_css_selector(".accountform-btn").click()
 
         try:
             self.client.find_element_by_css_selector('.tab')
@@ -73,14 +73,14 @@ class craigslistBot:
             return 0
 
         self.debug("Navigating to post page")
-        self.client.get("http://losangeles.craigslist.org/search/sgv/cps")
-        self.client.find_element_by_css_selector(".post a.no-mobile").click()
+        self.client.get("https://vancouver.craigslist.ca/search/bnc/lbs")
+        self.client.find_element_by_css_selector(".post").click()
         time.sleep(self.waitTime)
         self.client.find_element_by_css_selector("input[value='so']").click()
         time.sleep(self.waitTime)
-        self.client.find_element_by_css_selector("input[value='76']").click()
+        self.client.find_element_by_css_selector("input[value='82']").click()
         time.sleep(self.waitTime)
-        self.client.find_element_by_css_selector("input[value='4']").click()
+        self.client.find_element_by_css_selector("input[value='3']").click()
         time.sleep(self.waitTime)
 
         self.debug("Trying to fill in email")
@@ -114,7 +114,7 @@ class craigslistBot:
 
         self.debug("Getting post content")
         f = open(self.postContent, "rb")
-        content = f.read()
+        content = f.read().decode()
         f.close()
 
         self.debug("Spinning content")
