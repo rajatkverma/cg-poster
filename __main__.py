@@ -5,6 +5,12 @@
 # Start dev: 10/16/2015 11:38pm
 # End dev: 10/17/2015 1:45am
 
+# Command to run
+# python __main__.py "email@email.com" "password" "123-456-7890" "Mike" "HEADING - Move In Or Move Out for 29.99(Includes Vehicle Insurance + Gas)" "content.txt" 3 2
+
+# To debug
+# ipdb.set_trace()
+
 import sys, argparse, string, ctypes, os, re
 import urllib
 import time, base64, ipdb
@@ -27,7 +33,7 @@ class craigslistBot:
     def debug(self, inString):
         print (" [LOG] {BOT} - %s" % inString.encode('utf-8').strip())
 
-    def __init__(self, loginEmail = "", loginPass = "", contactNumber = "", contactName = "", postTitle = "", postCode = "", postContentFile = "", waitTime = 10):
+    def __init__(self, loginEmail = "", loginPass = "", contactNumber = "", contactName = "", postTitle = "", postCode = "", postContentFile = "", location = "", waitTime = 10):
         self.display = ""
 
         if not os.name == 'nt':
@@ -43,6 +49,7 @@ class craigslistBot:
         self.postTitle     = postTitle
         self.postCode      = postCode
         self.postContent   = postContentFile
+        self.location      = location
         self.waitTime      = waitTime
 
     def __del__(self):
@@ -80,7 +87,7 @@ class craigslistBot:
         time.sleep(self.waitTime)
         self.client.find_element_by_css_selector("input[value='82']").click()
         time.sleep(self.waitTime)
-        self.client.find_element_by_css_selector("input[value='3']").click()
+        self.client.find_element_by_css_selector("input[value='" + str(self.location) + "']").click()
         time.sleep(self.waitTime)
 
         self.debug("Trying to fill in email")
@@ -134,21 +141,29 @@ class craigslistBot:
         finally:
             self.client.find_element_by_css_selector("#wantamap:checked").click()
         time.sleep(self.waitTime)
+
+        self.debug("Checking no replies to this email")
+        self.client.find_element_by_css_selector("input#A").click()
+
         self.debug("Clicking continue")
         self.client.find_element_by_css_selector('button[value="Continue"]').click()
+
+        ipdb.set_trace()
+
         time.sleep(self.waitTime)
         if "editimage" in self.client.current_url:
             self.debug("Clicking continue")
             self.client.find_element_by_css_selector('button.done').click()
         time.sleep(self.waitTime)
         self.debug("Clicking publish")
-        self.client.find_element_by_css_selector('.draft_warning button[value="Continue"]').click()
-        time.sleep(10)
 
-def main(loginEmail,loginPass,contactNumber,contactName,postTitle,postCode,postContentFile,waitTime):
+        self.client.find_element_by_css_selector('.draft_warning button[value="Continue"]').click()
+        time.sleep(5)
+
+def main(loginEmail,loginPass,contactNumber,contactName,postTitle,postCode,postContentFile,location,waitTime):
     startExecTime = time.time()
 
-    clBot = craigslistBot(loginEmail,loginPass,contactNumber,contactName,postTitle,postCode,postContentFile,waitTime)
+    clBot = craigslistBot(loginEmail,loginPass,contactNumber,contactName,postTitle,postCode,postContentFile,location,waitTime)
     clBot.login()
     clBot.createPost()
     endExecTime = time.time()
@@ -166,9 +181,10 @@ parser.add_argument('contactName',metavar='CONTACTNAME',type=str,help='Contact n
 parser.add_argument('postTitle', metavar='POSTTITLE', type=str, help='Title of the post to be made')
 parser.add_argument('postCode',metavar='POSTCODE',type=str,help='Zip code for post')
 parser.add_argument('postContent',metavar='POSTCONTENT',type=str, help='Path to file for post content')
+parser.add_argument('location',metavar='LOCATION',type=int,help='Location: where to post? Surrey, North Vancouver etc.')
 parser.add_argument('waitTime',metavar='WAITTIME',type=int,help='Time to wait in between actions (Recommend 3)')
 args = parser.parse_args()
-main(args.loginEmail,args.loginPass,args.contactNumber,args.contactName,args.postTitle,args.postCode,args.postContent,args.waitTime)
+main(args.loginEmail,args.loginPass,args.contactNumber,args.contactName,args.postTitle,args.postCode,args.postContent,args.location,args.waitTime)
 
 # Test Execution
 # python {{SCRIPTNAME}} "example@example.com" "password" "123-456-7890" "Bob" "Post Title" "12345" "content.txt" 3
