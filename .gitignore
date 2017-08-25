@@ -26,3 +26,4 @@ pip-log.txt
 .DS_Store
 geckodriver.log
 script.sh
+content.txt
