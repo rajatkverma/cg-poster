@@ -148,12 +148,18 @@ class craigslistBot:
         self.debug("Clicking continue")
         self.client.find_element_by_css_selector('button[value="Continue"]').click()
 
-        ipdb.set_trace()
-
         time.sleep(self.waitTime)
+
+        # Upload Image/s
         if "editimage" in self.client.current_url:
-            self.debug("Clicking continue")
+            self.debug("Uploading image")
+            self.client.find_element_by_css_selector('a#classic').click()
+            time.sleep(2)
+            self.client.find_element_by_css_selector("input[type=\"file\"]").send_keys(os.getcwd()+"/truck.jpg")
+            time.sleep(5)
             self.client.find_element_by_css_selector('button.done').click()
+
+
         time.sleep(self.waitTime)
         self.debug("Clicking publish")
 
